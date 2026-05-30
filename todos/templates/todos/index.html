@@ -1,64 +1,201 @@
 {% extends 'todos/base.html' %}
 
 {% block title %}
-<title>Todo list</title>
+<title>Todo List</title>
 {% endblock %}
 
 {% block content %}
-<div class="container">
+<style>
+  body {
+    background: #f5f3ff;
+    min-height: 100vh;
+  }
 
-  <!-- title row -->
-  <div class="row">
-    <div class="offset-md-2 col-lg-9">
-      <div class="page-header">
-        <h1>
-          Todo List
-        </h1>
-      </div>
-    </div>
+  .todo-app {
+    max-width: 520px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .todo-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .todo-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #3730a3;
+    letter-spacing: -0.5px;
+  }
+
+  .todo-header p {
+    color: #6b7280;
+    font-size: 0.875rem;
+    margin-top: 4px;
+  }
+
+  .add-card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 1.5px solid #e0d9ff;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+  }
+
+  .add-card input[type="text"] {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    color: #1f2937;
+    background: #f5f3ff;
+    border-radius: 10px;
+    padding: 10px 14px;
+  }
+
+  .add-card input[type="text"]::placeholder {
+    color: #a5b4fc;
+  }
+
+  .add-card button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .add-card button:hover {
+    background: #4338ca;
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: #9ca3af;
+    margin-bottom: 0.75rem;
+    padding-left: 4px;
+  }
+
+  .todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .todo-item {
+    background: white;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #ede9fe;
+    transition: box-shadow 0.15s;
+  }
+
+  .todo-item:hover {
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.1);
+  }
+
+  .todo-item.todo-complete {
+    background: #fafafa;
+    border-color: #e5e7eb;
+  }
+
+  .todo-status-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #4f46e5;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .todo-title {
+    flex: 1;
+    font-size: 15px;
+    color: #1f2937;
+  }
+
+  .todo-complete .todo-title {
+    color: #9ca3af;
+    text-decoration: line-through;
+  }
+
+  .todo-delete {
+    color: #d1d5db;
+    font-size: 15px;
+    text-decoration: none;
+    padding: 5px 7px;
+    border-radius: 7px;
+    transition: color 0.15s, background 0.15s;
+  }
+
+  .todo-delete:hover {
+    color: #ef4444;
+    background: #fef2f2;
+  }
+
+  .todo-empty {
+    text-align: center;
+    padding: 3rem 0;
+    color: #c4b5fd;
+    font-size: 15px;
+  }
+</style>
+
+<div class="todo-app">
+
+  <div class="todo-header">
+    <h1>✦ My Tasks</h1>
+    <p>Stay on top of your day</p>
   </div>
 
-  <!-- Add a todo row -->
-  <div class="row">
-    <div class="offset-md-2 col-lg-9">
-      <form method="post" action="{% url 'todos:add' %}">
+  <!-- Add todo -->
+  <div class="add-card">
+    <form method="post" action="{% url 'todos:add' %}" style="display:flex; gap:10px; width:100%;">
+      {% csrf_token %}
+      <input type="text" name="title" placeholder="Add a new task..." required>
+      <button type="submit" name="submit">+ Add</button>
+    </form>
+  </div>
+
+  <!-- Todo list -->
+  {% if todo_list %}
+  <div class="section-label">Tasks</div>
+  <div class="todo-list">
+    {% for todo in todo_list %}
+    <div class="todo-item {% if todo.isCompleted %}todo-complete{% endif %}">
+      <form method="post" action="{% url 'todos:update' todo.id %}" style="display:contents;">
         {% csrf_token %}
-        <div class="form-row">
-          <div class="col-md-6">
-            <input type="text" class="form-control" name="title" placeholder="Do laundry" required>
-          </div>
-          <div class="col-md-6">
-            <button type="submit" name="submit" class="btn btn-outline-primary">
-              Add
-            </button>
-          </div>
-        </div>
+        <input
+          type="checkbox"
+          name="isCompleted"
+          class="todo-status-checkbox"
+          onchange="this.form.submit()"
+          {% if todo.isCompleted %}checked{% endif %}
+          title="{% if not todo.isCompleted %}Mark as done{% else %}Mark undone{% endif %}">
       </form>
+      <span class="todo-title">{{ todo.title }}</span>
+      <a href="{% url 'todos:delete' todo.id %}" class="todo-delete" title="Delete">
+        <i class="far fa-trash-alt"></i>
+      </a>
     </div>
+    {% endfor %}
   </div>
-  <hr />
+  {% else %}
+  <div class="todo-empty">No tasks yet — add one above!</div>
+  {% endif %}
 
-  <!-- todo list row -->
-  <div class="row">
-    <div class="offset-md-2 col-lg-6">
-      <div class="list-group">
-        {% for todo in todo_list %}
-        <div class="list-group-item {% if todo.isCompleted %} todo-complete {% endif %}">
-          <form style="display: inline;" method="post" action="{% url 'todos:update' todo.id %}">
-            {% csrf_token %}
-            <input type="checkbox" name="isCompleted" onchange="this.form.submit()" {% if todo.isCompleted %} checked
-              {% endif %} class="todo-status-checkbox"
-              title="{% if not todo.isCompleted %} mark as done {% else %} mark undone {% endif %}">
-          </form>
-          {{ todo.title }}
-          <a href="{% url 'todos:delete' todo.id %}" title="Delete">
-            <i class="far fa-trash-alt"></i>
-          </a>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
 </div>
-
 {% endblock %}
