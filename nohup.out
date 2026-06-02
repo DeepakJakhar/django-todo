@@ -1,0 +1,15 @@
+Error: Unable to access jarfile agent.jar
+May 30, 2026 7:55:19 AM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using /home/ubuntu/remoting as a remoting work directory
+May 30, 2026 7:55:19 AM org.jenkinsci.remoting.engine.WorkDirManager setupLogging
+INFO: Both error and output logs will be printed to /home/ubuntu/remoting
+May 30, 2026 7:55:19 AM hudson.remoting.Launcher createEngine
+INFO: Setting up agent: todo-dev
+May 30, 2026 7:55:19 AM hudson.remoting.Engine startEngine
+INFO: Using Remoting version: 3355.v388858a_47b_33
+May 30, 2026 7:55:19 AM org.jenkinsci.remoting.engine.WorkDirManager initializeWorkDir
+INFO: Using /home/ubuntu/remoting as a remoting work directory
+May 30, 2026 7:55:19 AM hudson.remoting.Launcher$CuiListener status
+INFO: WebSocket connection open
+May 30, 2026 7:55:19 AM hudson.remoting.Launcher$CuiListener status
+INFO: Connected
